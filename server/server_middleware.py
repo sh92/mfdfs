@@ -1,4 +1,6 @@
 import socket, os, sys
+from subprocess import call
+import subprocess
 
 
 def file_sender(location, client_socket):
@@ -30,6 +32,7 @@ def folder_sender(location, client_socket):
     os.chdir(location)
     location = os.getcwd()
     no = len(list(os.listdir(location)))
+    print subprocess.Popen("echo %s " % user_input, stdout=PIPE).stdout.read()
     client_socket.send(str(no))
     print("[*]Preparing to send %d objects[*]" % no)
     res =(client_socket.recv(1024))
@@ -80,18 +83,25 @@ def server_manager(location, client_socket):
 
 
 def show_list(client_socket, server_root_path, path):
-    realpath = os.path.abspath(server_root_path+path)
-    print("server root path", realpath)
+    realpath = os.path.abspath(server_root_path+path).decode()
+    x  = os.system("ls -l %s > ls.txt"% realpath)
+    f = open("ls.txt", "r")
     flist = os.listdir(realpath)
     client_socket.send(str(len(flist)).encode())
-    for x in flist:
-        f = x.encode()
-        client_socket.send(f)
+    ret = client_socket.recv(1024)
+    if ret != b'ok':
+        exit(1)
+    for x in f:
+        sys.stdout.write(x)
+        sys.stdout.flush()
+        client_socket.send(x.encode())
         ret = client_socket.recv(1024)
         if ret == b'ok':
             continue
         else:
             exit(1)
+    x  = os.system("rm ls.txt")
+   
 
 def cmd_manager(client_socket):
     #server_root_path = input("Type server root path")
@@ -100,10 +110,17 @@ def cmd_manager(client_socket):
 
     server_root_path = server_root_path
     while True:
+       print("")
        command = client_socket.recv(1024).decode()
        cmd = command.split()
        if cmd[0] == 'ls':
            show_list(client_socket, server_root_path, cmd[1] )
+       elif cmd[0] == 'exit':
+           exit(1)
+       else:
+           print("Invalid ")
+           exit(1)
+           
 
     #print("[*]The path of the file to send[*]")
     #location = sys.stdin.readline().rstrip()
