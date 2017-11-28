@@ -16,12 +16,13 @@ def put_file(machinename, username, dirname, filename, data):
     ssh.close()
 
 def get_file_list(client_socket, cmd):
-    print(" Requst File Lsit")
     client_socket.send(cmd.encode('utf-8'))
     no = client_socket.recv(1024)
-    for x in range(int(no)):
+    client_socket.send(b"ok")
+    for x in range(int(no)+1):
        f = client_socket.recv(1024).decode()
-       print("-", f)
+       sys.stdout.write(f)
+       sys.stdout.flush()
        client_socket.send(b"ok")
 
 def write_file(client_socket, cmd):
@@ -32,10 +33,9 @@ def read_file(client_socket, cmd):
 
 def cmd_manager(client_socket):
     while True:
+        print()
         print("[*] Type '?' to get information [*]")
         command = input(">>")
-        #print(">>")
-        #command = (sys.stdin.readline()).rstrip()
 
         cmd_list = command.split(" ")
         cmd = cmd_list[0]

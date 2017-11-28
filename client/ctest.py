@@ -2,9 +2,9 @@ import paramiko
 
 #ip = '172.17.0.2'
 ip = '183.107.51.103'
-port = 22
-username = 'lsh'
-password = '123'
+port = 2200
+username = 'robey'
+password = 'foo'
 
 def get_file_list(ip,port, user, pwd):
     print("start")
