@@ -82,8 +82,28 @@ def server_manager(location, client_socket):
         folder_sender(location, client_socket)
 
 
+def read_file(client_socket, server_root_path, path):
+    realpath = os.path.abspath(server_root_path+"/"+path).decode()
+    x  = os.system("cat %s > cat.txt"% realpath)
+    f = open("cat.txt", "r")
+    m = f.readline().split("\n")
+    m = m[:-1]
+    client_socket.send(str(len(m)).encode())
+    ret = client_socket.recv(1024)
+    if ret != b'ok':
+        exit(1)
+    for x in m:
+        sys.stdout.write(x)
+        sys.stdout.flush()
+        client_socket.send(x.encode())
+        ret = client_socket.recv(1024)
+        if ret == b'ok':
+            continue
+    os.system("rm cat.txt")
+
+
 def show_list(client_socket, server_root_path, path):
-    realpath = os.path.abspath(server_root_path+path).decode()
+    realpath = os.path.abspath(server_root_path+"/"+path).decode()
     x  = os.system("ls -l %s > ls.txt"% realpath)
     f = open("ls.txt", "r")
     flist = os.listdir(realpath)
@@ -100,25 +120,30 @@ def show_list(client_socket, server_root_path, path):
             continue
         else:
             exit(1)
-    x  = os.system("rm ls.txt")
+    os.system("rm ls.txt")
    
 
 def cmd_manager(client_socket):
     #server_root_path = input("Type server root path")
     server_root_path = os.getcwd()
+    if os.path.exists('home')==False:
+        os.mkdir('home')
     server_root_path = os.path.join(server_root_path, "home")
 
     server_root_path = server_root_path
     while True:
        print("")
        command = client_socket.recv(1024).decode()
-       cmd = command.split()
+       cmd = command.split(" ")
        if cmd[0] == 'ls':
            show_list(client_socket, server_root_path, cmd[1] )
-       elif cmd[0] == 'exit':
+       elif cmd[0] == 'cat':
+           read_file(client_socket, server_root_path, cmd[1] )
+       elif command == 'exit':
+           print("Exit")
            exit(1)
        else:
-           print("Invalid ")
+           print("Invalid Request")
            exit(1)
            
 
