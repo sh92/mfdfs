@@ -1,9 +1,8 @@
 import socket, os, sys
 import server_middleware as m
-#print("[*]Enter the IP[*]")
-#ip = sys.stdin.readline().rstrip()
-ip = '127.0.0.1'
-port = 9995
+print("[*]Enter the IP[*]")
+ip = sys.stdin.readline().rstrip()
+port = 9800
 
 def server_start():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
