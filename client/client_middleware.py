@@ -15,6 +15,10 @@ def put_file(machinename, username, dirname, filename, data):
     f.close()
     ssh.close()
 
+def get_local_file_list(cmd):
+    x = cmd.split(" ")
+    os.system("ls -l %s" % x[1])
+
 def get_file_list(client_socket, cmd):
     client_socket.send(cmd.encode('utf-8'))
     no = client_socket.recv(1024)
@@ -52,6 +56,8 @@ def cmd_manager(client_socket):
             print("[-] exit ")
         elif cmd == 'ls':
             get_file_list(client_socket, command)
+        elif cmd == 'lsl':
+            get_local_file_list(command)
         elif cmd == 'cd':
             write_file(client_socket, command)
         elif cmd == 'cat':
