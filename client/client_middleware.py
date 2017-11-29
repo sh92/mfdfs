@@ -30,6 +30,7 @@ def get_file_list(client_socket, cmd):
        client_socket.send(b"ok")
 
 def write_file(client_socket, cmd):
+    cmd_list=cmd.split(' ')
     pass
 
 def read_file(client_socket, cmd):
@@ -54,7 +55,7 @@ def cmd_manager(client_socket):
             print("[-] ls < path >: list file in remote directory")
             print("[-] lsl < path >: list file in local directory")
             print("[-] cat < path >  : read remote file")
-            print("[-] put < local file > < remote file > : save file")
+            print("[-] scp < local file > < remote file > : copy from local file to remote file")
             print("[-] get < remote file > : get remote file")
             print("[-] pwd < remote path > : get remote path")
             print("[-] mkdir < remote directory > : create remote directory")
@@ -62,17 +63,34 @@ def cmd_manager(client_socket):
             print("[-] syn : syncronize server")
             print("[-] exit ")
         elif cmd == 'ls':
+            if len(cmd_list) != 2:
+                print("Invalid Argument")
+                continue
             get_file_list(client_socket, command)
         elif cmd == 'lsl':
+            if len(cmd_list) != 2:
+                print("Invalid Argument")
+                continue
             get_local_file_list(command)
         elif cmd == 'cd':
+            if len(cmd_list) != 2:
+                print("Invalid Argument")
+                continue
             write_file(client_socket, command)
         elif cmd == 'cat':
+            if len(cmd_list) != 2:
+                print("Invalid Argument")
+                continue
             read_file(client_socket, command)
         elif cmd == 'pwd':
-            pass
+            if len(cmd_list) != 1:
+                print("Invalid Argument")
+                continue
         elif cmd == "exit":
+            if len(cmd_list) != 1:
+                print("Invalid Argument")
+                continue
             client_socket.send(b"exit")
             break
         else:
-            print("[*]Invalid Argument: %s" % command)
+            print("[*]Invalid Command : %s" % command)

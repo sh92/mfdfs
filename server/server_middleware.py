@@ -32,7 +32,6 @@ def folder_sender(location, client_socket):
     os.chdir(location)
     location = os.getcwd()
     no = len(list(os.listdir(location)))
-    print subprocess.Popen("echo %s " % user_input, stdout=PIPE).stdout.read()
     client_socket.send(str(no))
     print("[*]Preparing to send %d objects[*]" % no)
     res =(client_socket.recv(1024))
@@ -52,7 +51,7 @@ def folder_reciver(sv, client):
         os.mkdir(sv)
     except:
         print("[*]File %s already exists can't overwrite[*]" % sv)
-        sys.exit(0)
+        return
     os.chdir(sv)
     location = os.getcwd()
     print(location)
@@ -83,7 +82,7 @@ def server_manager(location, client_socket):
 
 
 def read_file(client_socket, server_root_path, path):
-    realpath = os.path.abspath(server_root_path+"/"+path).decode()
+    realpath = os.path.abspath(server_root_path+"/"+path)
     x  = os.system("cat %s > cat.txt"% realpath)
     f = open("cat.txt", "r")
     m = f.readline().split("\n")
@@ -91,7 +90,7 @@ def read_file(client_socket, server_root_path, path):
     client_socket.send(str(len(m)).encode())
     ret = client_socket.recv(1024)
     if ret != b'ok':
-        exit(1)
+        return 
     for x in m:
         sys.stdout.write(x)
         sys.stdout.flush()
@@ -103,14 +102,14 @@ def read_file(client_socket, server_root_path, path):
 
 
 def show_list(client_socket, server_root_path, path):
-    realpath = os.path.abspath(server_root_path+"/"+path).decode()
+    realpath = os.path.abspath(server_root_path+"/"+path)
     x  = os.system("ls -l %s > ls.txt"% realpath)
     f = open("ls.txt", "r")
     flist = os.listdir(realpath)
     client_socket.send(str(len(flist)).encode())
     ret = client_socket.recv(1024)
     if ret != b'ok':
-        exit(1)
+        return
     for x in f:
         sys.stdout.write(x)
         sys.stdout.flush()
@@ -119,7 +118,7 @@ def show_list(client_socket, server_root_path, path):
         if ret == b'ok':
             continue
         else:
-            exit(1)
+            return
     os.system("rm ls.txt")
    
 
@@ -141,13 +140,8 @@ def cmd_manager(client_socket):
            read_file(client_socket, server_root_path, cmd[1] )
        elif command == 'exit':
            print("Exit")
-           exit(1)
+           break
        else:
            print("Invalid Request")
-           exit(1)
+           break
            
-
-    #print("[*]The path of the file to send[*]")
-    #location = sys.stdin.readline().rstrip()
-    #server_manager(location, client_socket)
-    #print("[*]sent all[*]")
