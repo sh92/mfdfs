@@ -6,7 +6,6 @@ import time
 #TODO DB 연결 STATELESS 상태로 -> 파일들의 정보들을 database에 저장한다.
 
 BLOCK_SIZE = 1024
-
 def udp_download(client_socket, cmd,  fpath, server_ip):
     receiver_port = input('client udp  port : ')
     print(fpath)
@@ -80,7 +79,7 @@ def cmd_manager(client_socket, server_ip, server_port):
             print("[-] ls < path >: list file in remote directory")
             print("[-] lsl < path >: list file in local directory")
             print("[-] cat < path >  : read remote file")
-            print("[-] put < remote file > : put remote file")
+            print("[-] put < loacal file > : put lacal file to remote file")
             print("[-] get < remote file > : get remote file")
             print("[-] vi < remote file > : open remote file")
             print("[-] vil < local file > : open local file")
