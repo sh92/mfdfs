@@ -30,7 +30,6 @@ def udp_send(client_socket, fpath, server_ip, server_port, client_port):
     print("Finsh to send")
 
 
-
 def read_file(client_socket, server_root_path, path):
     realpath = os.path.abspath(server_root_path+"/"+path)
     x  = os.system("cat %s > cat.txt"% realpath)
@@ -41,9 +40,6 @@ def read_file(client_socket, server_root_path, path):
         num = int(fsize/BLOCK_SIZE)
     else:
         num = int(fsize/BLOCK_SIZE) + 1
-    #m = f.read().split("\n")
-    #m = m[:-1]
-    #print(len(m))
     client_socket.send(str(num).encode())
     ret = client_socket.recv(BLOCK_SIZE)
     if ret != b'ok':
@@ -58,15 +54,6 @@ def read_file(client_socket, server_root_path, path):
         ret = client_socket.recv(BLOCK_SIZE)
         if ret == b'ok':
             continue
-    '''
-    for x in m:
-        sys.stdout.write(x)
-        sys.stdout.flush()
-        client_socket.send(x.encode())
-        ret = client_socket.recv(BLOCK_SIZE)
-        if ret == b'ok':
-            continue
-    '''
     os.system("rm cat.txt")
 
 
