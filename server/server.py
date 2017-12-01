@@ -40,7 +40,7 @@ if __name__ == "__main__":
                 sockfd.send(b'connect')
                 CONNECTION_LIST.append(sockfd)
                 print("[*]Accepted connection form %s : %d[*]" % (addr[0], addr[1]))
-                m.cmd_manager(sockfd)
+                m.cmd_manager(sockfd, ip, port)
                 broadcast_data(sockfd, "Client (%s, %s) is offline" % addr)
                 sockfd.close()
                 CONNECTION_LIST.remove(sockfd)
@@ -55,4 +55,3 @@ if __name__ == "__main__":
                 sock.close()
                 CONNECTION_LIST.remove(sock)
                 continue
-
