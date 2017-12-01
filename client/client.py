@@ -34,14 +34,16 @@ if __name__ == '__main__':
             client.close()
             exit(1)
         print("Connected")
-        m.cmd_manager(client)
+        m.cmd_manager(client, primary_server_ip, port)
     except:
         print("[*]Coudn't connect to the requested primary server [*]")
         try:
             print("[*]Try to connect to the secondary server [*]")
             print("[*]Enter the secondary server IP [*]")
             seconday_server_ip = sys.stdin.readline().rstrip()
-            client.connect((seconday_server_ip , port))
-            m.cmd_manager(client)
+            print("[*]Enter the secondary server PORT [*]")
+            seconday_server_port = sys.stdin.readline().rstrip()
+            client.connect((seconday_server_ip , seconday_server_port))
+            m.cmd_manager(client, seconday_server_ip, seconday_server_port)
         except:
             exit(1)

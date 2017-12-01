@@ -1,49 +1,73 @@
 import socket, os, sys
-import paramiko
+#import paramiko
+from uftp import uftp
+import time
 
-def put_file(machinename, username, dirname, filename, data):
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(machinename, username=username)
-    sftp = ssh.open_sftp()
-    try:
-        sftp.mkdir(dirname)
-    except IOError:
-        pass
-    f = sftp.open(dirname + '/' + filename, 'w')
-    f.write(data)
-    f.close()
-    ssh.close()
+#TODO DB 연결 STATELESS 상태로 -> 파일들의 정보들을 database에 저장한다.
 
-def get_local_file_list(cmd):
+BLOCK_SIZE = 1024
+
+def udp_download(client_socket, cmd,  fpath, server_ip):
+    receiver_port = input('client udp  port : ')
+    print(fpath)
+    cmd = cmd + " " +receiver_port
+    client_socket.send(cmd.encode('utf-8'))
+    ret =  client_socket.recv(BLOCK_SIZE).decode()
+    if ret[:2] != 'ok':
+        print("Fail to receive")
+        return
+    server_async_port = int(ret[2:])
+    receiver_ip = socket.gethostbyname(socket.getfqdn())
+    uftp.receive(client_socket, server_ip, server_async_port, receiver_ip, receiver_port, fpath)
+
+def udp_upload(client_socket, cmd,  fpath, server_ip):
+    sender_port = input('client udp port : ')
+    cmd = cmd + " " + sender_port
+    client_socket.send(cmd.encode('utf-8'))
+    ret =  client_socket.recv(BLOCK_SIZE).decode()
+    print(ret)
+    if ret[:2] != 'ok':
+        print("Fail to send")
+        return
+    server_port = int(ret[2:])
+    sender_ip = socket.gethostbyname(socket.getfqdn())
+    uftp.send(sender_ip, sender_port, server_ip, server_port, fpath)
+
+def get_local_file_list(cmd, client_home):
     x = cmd.split(" ")
-    os.system("ls -l %s" % x[1])
+    directory = client_home + x[1]
+    os.system("ls -l %s" % directory)
 
 def get_file_list(client_socket, cmd):
     client_socket.send(cmd.encode('utf-8'))
-    no = client_socket.recv(1024)
+    no = client_socket.recv(BLOCK_SIZE)
     client_socket.send(b"ok")
     for x in range(int(no)+1):
-       f = client_socket.recv(1024).decode()
+       f = client_socket.recv(BLOCK_SIZE).decode()
        sys.stdout.write(f)
        sys.stdout.flush()
        client_socket.send(b"ok")
 
-def write_file(client_socket, cmd):
-    cmd_list=cmd.split(' ')
-    pass
+def local_open_file(cmd, client_home):
+    x = cmd.split(' ')
+    os.system('vi %s'% (client_home+x[1]))
+
+def local_remove_file(cmd, client_home):
+    x = cmd.split(' ')
+    os.system('rm %s'% (client_home+x[1]))
 
 def read_file(client_socket, cmd):
     client_socket.send(cmd.encode('utf-8'))
-    no = client_socket.recv(1024)
+    no = client_socket.recv(BLOCK_SIZE)
     client_socket.send(b"ok")
     for x in range(int(no)):
-       f = client_socket.recv(1024).decode()
+       f = client_socket.recv(BLOCK_SIZE).decode()
        sys.stdout.write(f)
        sys.stdout.flush()
        client_socket.send(b"ok")
 
-def cmd_manager(client_socket):
+def cmd_manager(client_socket, server_ip, server_port):
+    client_home = os.getcwd()+'/home/'
     while True:
         print()
         print("[*] Type '?' to get information [*]")
@@ -51,16 +75,20 @@ def cmd_manager(client_socket):
 
         cmd_list = command.split(" ")
         cmd = cmd_list[0]
+        print("")
         if  cmd =="?":
             print("[-] ls < path >: list file in remote directory")
             print("[-] lsl < path >: list file in local directory")
             print("[-] cat < path >  : read remote file")
-            print("[-] scp < local file > < remote file > : copy from local file to remote file")
+            print("[-] put < remote file > : put remote file")
             print("[-] get < remote file > : get remote file")
-            print("[-] pwd < remote path > : get remote path")
-            print("[-] mkdir < remote directory > : create remote directory")
-            print("[-] cd < remote path > : change directory")
-            print("[-] syn : syncronize server")
+            print("[-] vi < remote file > : open remote file")
+            print("[-] vil < local file > : open local file")
+            #print("[-] scp < local file > < remote file > : copy from local file to remote file")
+            #print("[-] pwd < remote path > : get remote path")
+            #print("[-] mkdir < remote directory > : create remote directory")
+            #print("[-] cd < remote path > : change directory")
+            #print("[-] syn : syncronize server")
             print("[-] exit ")
         elif cmd == 'ls':
             if len(cmd_list) != 2:
@@ -71,21 +99,32 @@ def cmd_manager(client_socket):
             if len(cmd_list) != 2:
                 print("Invalid Argument")
                 continue
-            get_local_file_list(command)
-        elif cmd == 'cd':
+            get_local_file_list(command, client_home)
+        elif cmd == 'put':
             if len(cmd_list) != 2:
                 print("Invalid Argument")
                 continue
-            write_file(client_socket, command)
+            udp_upload(client_socket, command, client_home + cmd_list[1], server_ip)
+        elif cmd == 'get':
+            if len(cmd_list) != 2:
+                print("Invalid Argument")
+                continue
+            udp_download(client_socket, command, client_home+cmd_list[1] , server_ip)
         elif cmd == 'cat':
             if len(cmd_list) != 2:
                 print("Invalid Argument")
                 continue
             read_file(client_socket, command)
-        elif cmd == 'pwd':
-            if len(cmd_list) != 1:
+        elif cmd == 'vil':
+            if len(cmd_list) != 2:
                 print("Invalid Argument")
                 continue
+            local_open_file(command, client_home)
+        elif cmd == 'rml':
+            if len(cmd_list) != 2:
+                print("Invalid Argument")
+                continue
+            local_remove_file(command, client_home)
         elif cmd == "exit":
             if len(cmd_list) != 1:
                 print("Invalid Argument")
