@@ -2,15 +2,18 @@ import socket, os, sys
 import client_middleware as m
 
 #TODO IMPLEMENTE NAME SERVER LATER
+DNS_SERVER_IP = '127.0.0.1'
+DNS_SERVER_PORT = 6000
 
 DNS={}
-server_ip_list = ['127.0.0.1','192.168.0.3']
+server_ip_list = ['127.0.0.1','127.0.0.1']
+server_port_list = [9000,8000]
 DNS['server'] = server_ip_list
 
 print("[*]Enter server the IP[*]")
-primary_server_ip = sys.stdin.readline().rstrip()
+primary_server_ip = sys.stdin.readline().rstrip() #server_ip_list[0]
 print("[*]Enter server the PORT[*]")
-port = int(sys.stdin.readline().rstrip())
+port = int(sys.stdin.readline().rstrip()) #server_port_list[0]
 
 IS_SERVER = False
 for s_ip in DNS['server']:
@@ -40,9 +43,9 @@ if __name__ == '__main__':
         try:
             print("[*]Try to connect to the secondary server [*]")
             print("[*]Enter the secondary server IP [*]")
-            seconday_server_ip = sys.stdin.readline().rstrip()
+            seconday_server_ip = sys.stdin.readline().rstrip() #server_ip_list[0]
             print("[*]Enter the secondary server PORT [*]")
-            seconday_server_port = sys.stdin.readline().rstrip()
+            seconday_server_port = sys.stdin.readline().rstrip() #server_port_list[0]
             client.connect((seconday_server_ip , seconday_server_port))
             m.cmd_manager(client, seconday_server_ip, seconday_server_port)
         except:

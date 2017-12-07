@@ -80,6 +80,7 @@ def show_list(client_socket, server_root_path, path):
 
 def cmd_manager(client_socket, server_ip, server_port):
     #server_root_path = input("Type server root path")
+    #TODO Primary ? Secondary?
     server_root_path = os.getcwd()
     if os.path.exists('home')==False:
         os.mkdir('home')

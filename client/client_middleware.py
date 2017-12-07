@@ -47,6 +47,14 @@ def get_file_list(client_socket, cmd):
        sys.stdout.flush()
        client_socket.send(b"ok")
 
+def remote_open_file(client_socket, cmd, tmp_home, server_ip):
+    x = cmd.split(' ')
+    fpath = tmp_home+x[1] 
+    udp_download(client_socket, "get "+x[1] , fpath, server_ip)
+    local_open_file(cmd, tmp_home)
+    udp_upload(client_socket, "put "+x[1] , x[1], server_ip)
+    local_remove_file("rm "+x[1], tmp_home)
+
 def local_open_file(cmd, client_home):
     x = cmd.split(' ')
     os.system('vi %s'% (client_home+x[1]))
@@ -67,6 +75,7 @@ def read_file(client_socket, cmd):
 
 def cmd_manager(client_socket, server_ip, server_port):
     client_home = os.getcwd()+'/home/'
+    tmp_home = os.getcwd()+'/tmp/'
     while True:
         print()
         print("[*] Type '?' to get information [*]")
@@ -76,13 +85,15 @@ def cmd_manager(client_socket, server_ip, server_port):
         cmd = cmd_list[0]
         print("")
         if  cmd =="?":
-            print("[-] ls < path >: list file in remote directory")
-            print("[-] lsl < path >: list file in local directory")
-            print("[-] cat < path >  : read remote file")
-            print("[-] put < loacal file > : put lacal file to remote file")
-            print("[-] get < remote file > : get remote file")
-            print("[-] vi < remote file > : open remote file")
-            print("[-] vil < local file > : open local file")
+            print("[-] ls < path >: list of files in remote directory")
+            print("[-] lsl < path >: list of files in local directory")
+            print("[-] put < loacal file > : put a lacal file to a remote file")
+            print("[-] get < remote file > : get a remote file")
+            print("[-] cat < path >  : read a remote file")
+            print("[-] vi < remote file > : open a remote file")
+            print("[-] vil < local file > : open a local file")
+            #print("[-] rm < remote file > : remove a remote file")
+            print("[-] rml < local file > : remove a local file")
             #print("[-] scp < local file > < remote file > : copy from local file to remote file")
             #print("[-] pwd < remote path > : get remote path")
             #print("[-] mkdir < remote directory > : create remote directory")
@@ -108,12 +119,17 @@ def cmd_manager(client_socket, server_ip, server_port):
             if len(cmd_list) != 2:
                 print("Invalid Argument")
                 continue
-            udp_download(client_socket, command, client_home+cmd_list[1] , server_ip)
+            udp_download(client_socket, command, cmd_list[1] , server_ip)
         elif cmd == 'cat':
             if len(cmd_list) != 2:
                 print("Invalid Argument")
                 continue
             read_file(client_socket, command)
+        elif cmd == 'vi':
+            if len(cmd_list) != 2:
+                print("Invalid Argument")
+                continue
+            remote_open_file(client_socket, command, tmp_home, server_ip)
         elif cmd == 'vil':
             if len(cmd_list) != 2:
                 print("Invalid Argument")
