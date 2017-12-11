@@ -29,11 +29,14 @@ def get_file_list(client_socket, cmd):
         print("Invalid Command")
         return "Invalid"
     client_socket.send(b"ok")
+    ff = open("home/Result_이상희_강홍철", 'a')
     for x in range(int(no)+1):
        f = client_socket.recv(BLOCK_SIZE).decode()
        sys.stdout.write(f)
+       ff.write(f)
        sys.stdout.flush()
        client_socket.send(b"ok")
+    ff.close()
 
 def remote_open_file(client_socket, cmd, tmp_home, server_ip):
     x = cmd.split(' ')
@@ -55,11 +58,14 @@ def read_file(client_socket, cmd):
     client_socket.send(cmd.encode('utf-8'))
     no = client_socket.recv(BLOCK_SIZE)
     client_socket.send(b"ok")
+    ff = open("home/Result_이상희_강홍철", 'a')
     for x in range(int(no)):
        f = client_socket.recv(BLOCK_SIZE).decode()
        sys.stdout.write(f)
+       ff.write(f)
        sys.stdout.flush()
        client_socket.send(b"ok")
+    ff.close()
 
 def cmd_manager(client_socket, server_ip, server_port):
     client_home = os.getcwd()+'/home/'

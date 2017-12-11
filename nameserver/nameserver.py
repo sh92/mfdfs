@@ -9,7 +9,7 @@ DNS_SERVER_PORT = 6000
 
 DNS = {}
 # Reverse Oder
-DNS['www.mysite.com'] = [['127.0.0.1', 8200], ['127.0.0.1', 9200]]
+DNS['www.mysite.com'] = [['127.0.0.1', 8200], ['127.0.0.1',9200]]
 
 class NameServer(object):
     def __init__(self, host, port):
