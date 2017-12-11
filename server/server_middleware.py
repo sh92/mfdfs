@@ -99,12 +99,10 @@ def cmd_manager(client_socket, server_ip, server_port):
        elif cmd[0] == 'cat':
            read_file(client_socket, server_root_path, cmd[1] )
        elif cmd[0] == 'get':
-           print(cmd)
            udp_send( server_root_path+cmd[1], cmd[2], cmd[3])
        elif cmd[0] == 'put':
-           udp_receive(client_socket, server_root_path+cmd[1], server_ip)
-           #syncroniztion(client_socket, server_port, cmd, server_ip, server_port)
-           #udp_receive(client_socket, server_root_path+cmd[1], server_ip, server_port, cmd[2])
+           #udp_receive(client_socket, server_root_path+cmd[1], server_ip)
+           syncroniztion(client_socket, server_port, cmd, server_ip, server_port)
        elif command == 'exit':
            print("Exit")
            break
