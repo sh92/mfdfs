@@ -3,13 +3,15 @@ import socket
 import sys
 import time
 
-
-def receive(client_socket, sender_ip, sender_port, receiver_ip, receiver_port, fpath, buffer_size=1024):
+def receive(client_socket, cmd, fpath, buffer_size=1024):
+    receiver_ip = socket.gethostbyname(socket.getfqdn())
     print("ready for receive... ")
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
+    sock.bind((receiver_ip, 0))
+    receiver_port = sock.getsockname()[1]
+    cmd = cmd + " " +receiver_ip+" "+str(receiver_port)
     receiver_port = int(receiver_port)
-    sock.bind((receiver_ip, receiver_port))
-    client_socket.send("ok".encode())
+    client_socket.send(cmd.encode('utf-8'))
     try:
         filesize, addr = sock.recvfrom(buffer_size)
         filesize = filesize.decode()
@@ -40,10 +42,10 @@ def receive(client_socket, sender_ip, sender_port, receiver_ip, receiver_port, f
         print(e)
         sys.exit()
 
-def send(sender_ip, sender_port, receiver_ip, receiver_port, fpath, buffer_size=1024):
-    sock  = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #UDP
+def send(receiver_ip, receiver_port, fpath, buffer_size=1024):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) #UDP
     sock.settimeout(10)
-    size=0
+    size = 0
     filesize = os.path.getsize(fpath) 
     remain = filesize
     receiver_port = int(receiver_port)

@@ -1,36 +1,21 @@
 import socket, os, sys
-#import paramiko
 from uftp import uftp
 import time
 
-#TODO DB 연결 STATELESS 상태로 -> 파일들의 정보들을 database에 저장한다.
-
 BLOCK_SIZE = 1024
 def udp_download(client_socket, cmd,  fpath, server_ip):
-    receiver_port = input('client udp  port : ')
-    print(fpath)
-    cmd = cmd + " " +receiver_port
-    client_socket.send(cmd.encode('utf-8'))
-    ret =  client_socket.recv(BLOCK_SIZE).decode()
-    if ret[:2] != 'ok':
-        print("Fail to receive")
-        return
-    server_async_port = int(ret[2:])
-    receiver_ip = socket.gethostbyname(socket.getfqdn())
-    uftp.receive(client_socket, server_ip, server_async_port, receiver_ip, receiver_port, fpath)
+    uftp.receive(client_socket, cmd, fpath )
 
 def udp_upload(client_socket, cmd,  fpath, server_ip):
-    sender_port = input('client udp port : ')
-    cmd = cmd + " " + sender_port
     client_socket.send(cmd.encode('utf-8'))
-    ret =  client_socket.recv(BLOCK_SIZE).decode()
+    ret = client_socket.recv(BLOCK_SIZE).decode()
     print(ret)
     if ret[:2] != 'ok':
         print("Fail to send")
         return
     server_port = int(ret[2:])
-    sender_ip = socket.gethostbyname(socket.getfqdn())
-    uftp.send(sender_ip, sender_port, server_ip, server_port, fpath)
+    print(server_port)
+    uftp.send(server_ip, server_port, fpath)
 
 def get_local_file_list(cmd, client_home):
     x = cmd.split(" ")
@@ -39,7 +24,10 @@ def get_local_file_list(cmd, client_home):
 
 def get_file_list(client_socket, cmd):
     client_socket.send(cmd.encode('utf-8'))
-    no = client_socket.recv(BLOCK_SIZE)
+    no = client_socket.recv(BLOCK_SIZE).decode()
+    if no == 'Invalid':
+        print("Invalid Command")
+        return "Invalid"
     client_socket.send(b"ok")
     for x in range(int(no)+1):
        f = client_socket.recv(BLOCK_SIZE).decode()
@@ -52,8 +40,8 @@ def remote_open_file(client_socket, cmd, tmp_home, server_ip):
     fpath = tmp_home+x[1] 
     udp_download(client_socket, "get "+x[1] , fpath, server_ip)
     local_open_file(cmd, tmp_home)
-    udp_upload(client_socket, "put "+x[1] , x[1], server_ip)
-    local_remove_file("rm "+x[1], tmp_home)
+    udp_upload(client_socket, "put "+x[1], tmp_home+x[1], server_ip)
+    local_remove_file("rml "+x[1], tmp_home)
 
 def local_open_file(cmd, client_home):
     x = cmd.split(' ')
@@ -94,11 +82,6 @@ def cmd_manager(client_socket, server_ip, server_port):
             print("[-] vil < local file > : open a local file")
             #print("[-] rm < remote file > : remove a remote file")
             print("[-] rml < local file > : remove a local file")
-            #print("[-] scp < local file > < remote file > : copy from local file to remote file")
-            #print("[-] pwd < remote path > : get remote path")
-            #print("[-] mkdir < remote directory > : create remote directory")
-            #print("[-] cd < remote path > : change directory")
-            #print("[-] syn : syncronize server")
             print("[-] exit ")
         elif cmd == 'ls':
             if len(cmd_list) != 2:
@@ -119,7 +102,7 @@ def cmd_manager(client_socket, server_ip, server_port):
             if len(cmd_list) != 2:
                 print("Invalid Argument")
                 continue
-            udp_download(client_socket, command, cmd_list[1] , server_ip)
+            udp_download(client_socket, command, client_home+cmd_list[1], server_ip)
         elif cmd == 'cat':
             if len(cmd_list) != 2:
                 print("Invalid Argument")
@@ -148,3 +131,6 @@ def cmd_manager(client_socket, server_ip, server_port):
             break
         else:
             print("[*]Invalid Command : %s" % command)
+    print("Exit")
+    sys.exit(0)
+    return
