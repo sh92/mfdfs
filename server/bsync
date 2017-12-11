@@ -1026,7 +1026,7 @@ resp = "none"
 if batch: resp = "y"
 
 while resp != "y" and resp != "n":
-	resp = myinput("Apply actions? [y/N] ").lower()
+	resp = "y"#myinput("Apply actions? [y/N] ").lower()
 	if resp == "": resp = "n"
 print()
 if resp == "n":

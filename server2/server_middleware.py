@@ -70,16 +70,24 @@ def show_list(client_socket, server_root_path, path):
     os.system("rm ls.txt")
 
 def syncroniztion(client_socket, server_root_path, cmd, server_ip, server_port):
+    udp_receive(client_socket, server_root_path+cmd[1], server_ip)
 
+    ssh_id = 'id'
+    ssh_password = '1234'
+    ip = '127.0.0.1'
+    os.system('sshpass -p '+ssh_password+' ./bsync -i /home/backup '+ssh_id+'@'+ip+':/home/backup')
+    ''' #nameserver
     ns = dns.NS(DNS_SERVER_IP, DNS_SERVER_PORT)
     status_dict = ns.nslookup(domain)
-    udp_receive(client_socket, server_root_path+cmd[1], server_ip)
     for ip, port in ns.get_server_addr():
         if ip == server_ip and port == server_port:
             continue
         print(ip, port)
         print("Syncronization")
-        #os.system('bsync ./home '+ip+':'+port+'/home')
+        ssh_id = input("ssh ID")
+        ssh_password = input("Password: ")
+        os.system('sshpass -p '+ssh_password+' ./bsync -i /home/backup '+ssh_id+'@'+ip+':/home/backup')
+    '''
 
 
 def cmd_manager(client_socket, server_ip, server_port):
@@ -95,9 +103,9 @@ def cmd_manager(client_socket, server_ip, server_port):
        print(command)
        cmd = command.split(" ")
        if cmd[0] == 'ls':
-           show_list(client_socket, server_root_path, cmd[1])
+           show_list(client_socket, server_root_path, cmd[1] )
        elif cmd[0] == 'cat':
-           read_file(client_socket, server_root_path, cmd[1])
+           read_file(client_socket, server_root_path, cmd[1] )
        elif cmd[0] == 'get':
            udp_send( server_root_path+cmd[1], cmd[2], cmd[3])
        elif cmd[0] == 'put':
