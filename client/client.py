@@ -3,7 +3,7 @@ import client_middleware as m
 import dns_request as dns
 
 #TODO IMPLEMENTE NAME SERVER LATER
-DNS_SERVER_IP = '127.0.0.1'
+DNS_SERVER_IP = '168.188.129.216'
 DNS_SERVER_PORT = 6000
 domain = 'www.mysite.com'
 

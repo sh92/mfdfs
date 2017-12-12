@@ -6,7 +6,6 @@ import time
 import dns_request as dns
 
 BLOCK_SIZE = 1024
-server_another_port = 9876
 
 DNS_SERVER_IP = "127.0.0.1"
 DNS_SERVER_PORT = 6000
@@ -74,8 +73,11 @@ def syncroniztion(client_socket, server_root_path, cmd, server_ip, server_port):
 
     ssh_id = 'id'
     ssh_password = '1234'
-    ip = '127.0.0.1'
+    ip = 'ip'
+    start = time.time()
     os.system('sshpass -p '+ssh_password+' ./bsync -i /home/backup '+ssh_id+'@'+ip+':/home/backup')
+    end = time.time()
+    print("Time elapsed : ", end- start)
     ''' #nameserver
     ns = dns.NS(DNS_SERVER_IP, DNS_SERVER_PORT)
     status_dict = ns.nslookup(domain)
@@ -91,12 +93,13 @@ def syncroniztion(client_socket, server_root_path, cmd, server_ip, server_port):
 
 
 def cmd_manager(client_socket, server_ip, server_port):
+    server_root_path = '/home/backup/'
+    '''
     server_root_path = os.getcwd()
     if os.path.exists('home')==False:
         os.mkdir('home')
     server_root_path = os.path.join(server_root_path, "home")+"/"
-
-    server_root_path = server_root_path
+    '''  
     while True:
        print("")
        command = client_socket.recv(1024).decode()
@@ -109,8 +112,8 @@ def cmd_manager(client_socket, server_ip, server_port):
        elif cmd[0] == 'get':
            udp_send( server_root_path+cmd[1], cmd[2], cmd[3])
        elif cmd[0] == 'put':
-           udp_receive(client_socket, server_root_path+cmd[1], server_ip)
-           #syncroniztion(client_socket, server_port, cmd, server_ip, server_port)
+           #udp_receive(client_socket, server_root_path+cmd[1], server_ip)
+           syncroniztion(client_socket, server_root_path, cmd, server_ip, server_port)
        elif command == 'exit':
            print("Exit")
            break

@@ -4,6 +4,8 @@ import sys
 import time
 from contextlib import closing
 
+FTP_PORT = 6666
+
 def find_free_port():
     with closing(socket.socket(socket.AF_INET, socket.SOCK_DGRAM)) as s:
         s.bind(('', 0))
@@ -12,8 +14,10 @@ def find_free_port():
 
 def receive(sender_sock, receiver_ip, fpath, buffer_size=1024):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
+    #receiver_port = FTP_PORT
     sock.bind((receiver_ip, 0))
     receiver_port = sock.getsockname()[1]
+    print(receiver_port)
     sender_sock.send(('ok'+str(receiver_port)).encode())
     print("Wating udp....")
     print(fpath)

@@ -31,7 +31,7 @@ def get_file_list(client_socket, cmd):
         return "Invalid"
     client_socket.send(b"ok")
     ff = open("home/Result_이상희_강홍철", 'a')
-    for x in range(int(no)+1):
+    for x in range(int(no)):
        f = client_socket.recv(BLOCK_SIZE).decode()
        sys.stdout.write(f)
        if recorded == "y":
@@ -66,7 +66,7 @@ def read_file(client_socket, cmd):
        f = client_socket.recv(BLOCK_SIZE).decode()
        sys.stdout.write(f)
        if recorded  == "y":
-         ff.write(f)
+          ff.write(f)
        sys.stdout.flush()
        client_socket.send(b"ok")
     ff.close()

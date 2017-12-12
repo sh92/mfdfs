@@ -9,6 +9,7 @@ def receive(client_socket, cmd, fpath, buffer_size=1024):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
     sock.bind((receiver_ip, 0))
     receiver_port = sock.getsockname()[1]
+    print(receiver_port)
     cmd = cmd + " " +receiver_ip+" "+str(receiver_port)
     receiver_port = int(receiver_port)
     client_socket.send(cmd.encode('utf-8'))
