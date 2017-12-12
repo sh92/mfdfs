@@ -23,14 +23,14 @@ def get_local_file_list(cmd, client_home):
     os.system("ls -l %s" % directory)
 
 def get_file_list(client_socket, cmd):
-    recorded= input("Would you like to record to Result_이상희_강홍철?[y/n]").lower()
+    recorded= input("Would you like to record to Result?[y/n]").lower()
     client_socket.send(cmd.encode('utf-8'))
     no = client_socket.recv(BLOCK_SIZE).decode()
     if no == 'Invalid':
         print("Invalid Command")
         return "Invalid"
     client_socket.send(b"ok")
-    ff = open("home/Result_이상희_강홍철", 'a')
+    ff = open("home/Result", 'a')
     for x in range(int(no)):
        f = client_socket.recv(BLOCK_SIZE).decode()
        sys.stdout.write(f)
@@ -57,11 +57,11 @@ def local_remove_file(cmd, client_home):
     os.system('rm %s'% (client_home+x[1]))
 
 def read_file(client_socket, cmd):
-    recorded = input("Would you like to record to Result_이상희_강홍철?[y/n]").lower()
+    recorded = input("Would you like to record to Result?[y/n]").lower()
     client_socket.send(cmd.encode('utf-8'))
     no = client_socket.recv(BLOCK_SIZE)
     client_socket.send(b"ok")
-    ff = open("home/Result_이상희_강홍철", 'a')
+    ff = open("home/Result", 'a')
     for x in range(int(no)):
        f = client_socket.recv(BLOCK_SIZE).decode()
        sys.stdout.write(f)
