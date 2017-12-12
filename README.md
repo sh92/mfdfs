@@ -1,4 +1,4 @@
 # mfdfs
 My first distributed  file system
 
-![scenario]("./img/scenario.png")
+![scenario](./img/scenario.png)
