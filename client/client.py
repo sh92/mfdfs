@@ -1,7 +1,6 @@
 import socket, os, sys
 import client_middleware as m
 import dns_request as dns
-import threading
 
 #TODO IMPLEMENTE NAME SERVER LATER
 DNS_SERVER_IP = '127.0.0.1'
