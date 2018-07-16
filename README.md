@@ -8,8 +8,10 @@
     * Name Server: Redis + raw socket
     * Client : raw socket
 
-* Arichitecutre  
+* Architecture 
+
 ![scenario](./img/scenario.png)  
 
 * Command  
+
 ![command](./img/command.png)  
