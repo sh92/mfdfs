@@ -1,17 +1,17 @@
 # mfdfs
 * This is my project in the distributed file system courese.
 
-* Enviroments
+## Enviroments
     * Language : python3
     * Primary Server: Multithread + rsync + raw socket 
     * Secondary Server: Multithread + rsync + raw socket 
     * Name Server: Redis + raw socket
     * Client : raw socket
 
-* Architecture 
+## Architecture 
 
 ![scenario](./img/scenario.png)  
 
-* Command  
+## Command  
 
 ![command](./img/command.png)  
