@@ -1,5 +1,4 @@
 # mfdfs
-* My first distributed file system
 * This is my project in the distributed file system courese.
 
 * Enviroments
@@ -9,7 +8,8 @@
     * Name Server: Redis + raw socket
     * Client : raw socket
 
-![scenario](./img/scenario.png)
+* Arichitecutre  
+![scenario](./img/scenario.png)  
 
-* Command
-![command](./img/command.png)
+* Command  
+![command](./img/command.png)  
